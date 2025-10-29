@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'success_screen.dart'; // Make sure this import exists
+import 'package:audioplayers/audioplayers.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,11 +15,13 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   String? _selectedAvatar;
   double _progress = 0.0;
+  int _completedCount = 0;
 
   final List<String> _avatarOptions = [
     'assets/bear_avatar.png',
@@ -36,6 +39,12 @@ class _SignupScreenState extends State<SignupScreen> {
     if (_passwordController.text.isNotEmpty) completed++;
     if (_dobController.text.isNotEmpty) completed++;
     if (_selectedAvatar != null) completed++;
+
+    if (completed > _completedCount) {
+      _audioPlayer.play(AssetSource('success.mp3'));
+    }
+
+    _completedCount = completed;
 
     setState(() {
       _progress = completed / 5;

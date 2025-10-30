@@ -17,6 +17,11 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _dobController = TextEditingController();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _dobFocus = FocusNode();
+
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   String? _selectedAvatar;
@@ -178,6 +183,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _nameController,
                   label: 'Adventure Name',
                   icon: Icons.person,
+                  focusNode: _nameFocus,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'What should we call you on this adventure?';
@@ -193,6 +199,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _emailController,
                   label: 'Email Address',
                   icon: Icons.email,
+                  focusNode: _emailFocus,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'We need your email for adventure updates!';
@@ -210,7 +217,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 TextFormField(
                   controller: _dobController,
                   readOnly: true,
-                  onTap: _selectDate,
+                  focusNode: _dobFocus,
+                  onTap: () async {
+                    await _selectDate();
+                    _updateProgress();
+                    _passwordFocus.requestFocus();
+                  },
                   decoration: InputDecoration(
                     labelText: 'Date of Birth',
                     prefixIcon:
@@ -239,6 +251,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
+                  focusNode: _passwordFocus,
                   onChanged: (value) {
                     setState(() {
                       if (value.length >= 8) {
@@ -396,15 +409,24 @@ class _SignupScreenState extends State<SignupScreen> {
     required IconData icon,
     required String? Function(String?) validator,
     void Function(String)? onChanged,
+    FocusNode? focusNode,
   }) {
     return TextFormField(
       controller: controller,
       onChanged: onChanged,
+      focusNode: focusNode,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: Colors.deepPurple),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.deepPurple,
+            width: 2,
+          ),
         ),
         filled: true,
         fillColor: Colors.grey[50],
